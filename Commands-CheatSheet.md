@@ -2,13 +2,13 @@
 
 ## Initial Commands
 
-**whoami**: It shows you in the terminal which user you are using. 
-**id**: It shows you which groups you belong to and the ID of each group.
-**cd /name**: It changes the directory to the specified one; replace "name" with the name you want.
-**ls**: List files and directories in the path you are currently in. 
-  -a: flag that shows you all elements, including hidden ones.
-  -l: flag that shows you many details about files and directories.
-**pwd**: It shows you the exact route you are currently on.
-**exit**: Log out of current session.
-**sudo [user]**: It allows you to switch to the specified user.
-**sudo command**: It allows you to execute commands as root (a privileged user).
+* `whoami`: Shows the current logged-in user in the terminal.
+* `id`: Displays your user ID (UID) and the groups you belong to (GID).
+* `cd [directory]`: Changes the current directory. Use `cd /` to go to the root directory, or `cd ..` to go back one level.
+* `ls`: Lists files and directories in the current path.
+  * `-a`: Flag that shows all elements, including hidden files (starting with a dot).
+  * `-l`: Flag that shows detailed information (permissions, owner, size, date).
+* `pwd`: Print Working Directory. Shows the absolute path you are currently in.
+* `exit`: Logs out of the current session or closes the terminal.
+* `su [user]`: Switch User. Allows you to switch the current session to the specified user.
+* `sudo [command]`: SuperUser DO. Executes a specific command with root (administrator) privileges.
