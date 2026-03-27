@@ -52,6 +52,17 @@
 * `chgrp [newGroup] [directory/file]`: Allows us to change the group ownership of a file or directory.
   * `chgrp -R [newGroup] [directory]`: Does this recursively, applying the group change to the specified directory and all its contents.
 
+### Permissions in Octal Notation
+In Linux, permissions can also be represented in binary, where an active permission is `1` and an inactive one is `0`. For example, a directory with `r-x` permissions equals `101` in binary, and `rwx` equals `111`.
+
+By converting these binary values to octal numbers, we can assign permissions much faster and more comfortably. To do this, we use a simple numerical trick where **r = 4**, **w = 2**, and **x = 1**.
+* **Example 1:** If we have `r-x`, we know it's `101` in binary. Using our trick: `4 (r) + 0 (-) + 1 (x) = 5`. So the permission for that group is exactly 5.
+* **Complete Example:** `rwx|r-x|r--`.
+  * Owner (`rwx`): 4 + 2 + 1 = **7**
+  * Group (`r-x`): 4 + 0 + 1 = **5**
+  * Others (`r--`): 4 + 0 + 0 = **4**
+  * To assign these exact permissions, we would simply run: `chmod 754 [file]`.
+
 ### The Directory Bottleneck (Inheritance vs. Traversal)
 In Linux, permissions are not strictly inherited from parent to child. Instead, parent directories act as bottlenecks. 
 
@@ -78,3 +89,17 @@ In Linux, permissions are not strictly inherited from parent to child. Instead, 
   * `lsattr [file/directory]`: Command used to list extended file attributes.
   * **Immutable Flag (`+i`):** If we want to make a file completely immutable (preventing absolutely any modification, deletion, or renaming), we apply this attribute using `chattr +i [file]`. 
   * Once applied, **not even `root`** can modify or delete the file until the attribute is explicitly removed (`chattr -i [file]`). This offers a much higher level of security than standard read-only permissions (like `r-x|r--|r--`), which the root user could easily bypass or override.
+    
+ ### SUID and SGID (Privilege Escalation)
+* **SUID (Set Owner User ID):** If we list permissions and see an `s` instead of an `x` in the owner's permissions (e.g., `rwsr-xr-x`), or if it's represented in octal as `4xxx` (like `4755`), **DANGER! WE HAVE A POTENTIAL EXPLOITATION CANDIDATE.** * If a binary has the SUID bit set, any user who runs it will execute it with the privileges of the file's owner (which is usually `root`). This means we could potentially use it to escalate privileges permanently.
+  * To find all binaries with SUID permissions on our system, we use the following command:
+    `find / -type f -perm -4000 2>/dev/null`
+    * `/`: Searches the entire system starting from the root.
+    * `-type f`: Looks specifically for files.
+    * `-perm -4000`: Looks for files with the SUID bit set (`4000`). The `-` means it matches regardless of the other standard permissions.
+    * `2>/dev/null`: *(Pro-tip)* Redirects all "Permission denied" error messages to the void so our terminal output stays clean and readable.
+  * **Example:** If the `python` binary has SUID privileges, we could execute a specific payload to spawn a root shell. (To check exactly how to exploit specific binaries, we use: [GTFOBins](https://gtfobins.github.io/)).
+
+* **SGID (Set Group ID):** Represented by an `s` in the group's permissions (e.g., `rwxr-sr-x`) or octal `2xxx` (like `2755`). SGID has two different functions depending on where it's applied:
+  * **On a file:** Allows any user to execute the file with the permissions of the file's group owner.
+  * **On a directory:** Any new file or directory created inside it will automatically inherit the group ownership of the parent directory, rather than the primary group of the user who created it.
