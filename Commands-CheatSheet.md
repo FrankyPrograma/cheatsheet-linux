@@ -103,3 +103,39 @@ In Linux, permissions are not strictly inherited from parent to child. Instead, 
 * **SGID (Set Group ID):** Represented by an `s` in the group's permissions (e.g., `rwxr-sr-x`) or octal `2xxx` (like `2755`). SGID has two different functions depending on where it's applied:
   * **On a file:** Allows any user to execute the file with the permissions of the file's group owner.
   * **On a directory:** Any new file or directory created inside it will automatically inherit the group ownership of the parent directory, rather than the primary group of the user who created it.
+
+## File Descriptors (Pointers) and Redirection
+
+In Linux, data flows are managed using file descriptors, which we can conceptualize as default pointers. The main output pointers are:
+* `1` (stdout): Pointer for standard output (successes/results).
+* `2` (stderr): Pointer for standard errors.
+
+Redirectors are simply a way to make a pointer point to another direction; they redirect the output of a command to a specific file or stream.
+* `>`: The simplest redirector. It sends the standard output (stdout) of a command to a specified file so it no longer prints to the screen (e.g., `cat /etc/passwd > file.txt`). **Caution:** This will completely overwrite the existing contents of the file.
+* `>>`: Similar to the previous one, but with the difference that it **does not overwrite**. It simply appends the new output to the end of the file.
+* `&>`: Sends both successful outputs and errors (stdout and stderr) to the same place.
+
+### Useful Redirector Combinations
+* `2>/dev/null`: Sends the execution errors of a command to the Linux void (`/dev/null`) so they don't clutter our screen (remember that pointer `2` refers to errors).
+* `&>/dev/null`: Redirects the entire output of a command (both successes and errors) to `/dev/null`, resulting in absolute silence on the screen when executing a command.
+* `3>&1 1>&2 2>&3`: A technique to swap pointers so `1` outputs errors and `2` outputs successes. Let's break this down step by step:
+  * `3>&1`: We create our own backup pointer (`3`) and make it point to where `1` (successes) is currently pointing.
+  * `1>&2`: We change pointer `1` (successes) to point to where pointer `2` (errors) is pointing.
+  * `2>&3`: Finally, we make pointer `2` point to pointer `3`, which holds the original path for successes.
+  * *Result:* We have perfectly swapped the pointers without losing data. Pointer `1` now holds errors, and pointer `2` holds successes.
+
+## Cron Jobs
+
+Cron jobs are simply automated tasks scheduled to run at a specific time, either repeatedly or just once.
+
+The trickiest part of cron jobs is understanding how to configure the exact moment(s) they should execute. To master this, we need to understand the 5 configurable parameters: `* * * * *`. If we configure a task literally with these five asterisks, it will execute every single minute of every single day.
+
+* `First *`: Refers to the **minute** (0-59). For example, `2 * * * *` will run at minute 2 of every hour, every day. If we use a slash like `*/2 * * * *`, it will run EVERY 2 minutes.
+* `Second *`: Refers to the **hour** (0-23). For example, `0 14 * * *` will run exactly at 14:00 (2 PM) every day. *Note: If you use `* 14 * * *`, it will run every single minute during the 2 PM hour!* If we use `0 */2 * * *`, it will run exactly on the hour, every 2 hours.
+* `Third *`: Refers to the **day of the month** (1-31). `0 0 15 * *` will run at midnight on the 15th of every month. If we use `0 0 */2 * *`, it will run every two days.
+* `Fourth *`: Refers to the **month** (1-12). `0 0 * 5 *` will run daily at midnight, but only in May. If we use `0 0 * */5 *`, it will run every 5 months.
+* `Fifth *`: Refers to the **day of the week** (0-6, where 0 is Sunday and 6 is Saturday). `0 0 * * 5` will run at midnight every Friday. If we use `0 0 * * */2`, it will run every 2 days of the week.
+
+---
+
+> **🌟 Note:** This cheat sheet will be constantly updated and growing. I hope you find it as helpful as I do! If it did help you, leaving a **Star (⭐)** on this repository would mean a lot to me and help me keep pushing forward. Happy Hacking! 👾
