@@ -22,6 +22,13 @@
   * `mv file.txt /new_directory/`: Moves the file to the specified directory.
   * `mv file.txt new_name.txt`: Renames the file in the current directory.
   * `mv file.txt /new_directory/new_name.txt`: Moves and renames the file at the same time.
+* `find`: This command helps you search for files or directories based on name, extension, size, etc.
+  * `find -name [filename]`: With the `-name` flag, you can filter by exact file name.
+  * `find -size [size]`: We can specify the size using different units (`k`=kilobytes, `M`=Megabytes, `G`=Gigabytes...). We can search for an exact size, or use `+100k` (greater than) and `-100k` (less than).
+  * `find -user [user] | -not -user [user]`: Filter by the user it belongs to (or doesn't belong to).
+  * `find -group [group] | -not -group [group]`: Filter by the group it belongs to (or doesn't belong to).
+  * `find -type f | -type d | -type l`: Filter by type (`f`=file, `d`=directory, `l`=link).
+  * *Note: There are many more flags; these are just some of the most important ones. Researching further is highly recommended.*
 
 ## Create User and Groups Commands
 
@@ -90,7 +97,7 @@ In Linux, permissions are not strictly inherited from parent to child. Instead, 
   * **Immutable Flag (`+i`):** If we want to make a file completely immutable (preventing absolutely any modification, deletion, or renaming), we apply this attribute using `chattr +i [file]`. 
   * Once applied, **not even `root`** can modify or delete the file until the attribute is explicitly removed (`chattr -i [file]`). This offers a much higher level of security than standard read-only permissions (like `r-x|r--|r--`), which the root user could easily bypass or override.
     
- ### SUID and SGID (Privilege Escalation)
+### SUID and SGID (Privilege Escalation)
 * **SUID (Set Owner User ID):** If we list permissions and see an `s` instead of an `x` in the owner's permissions (e.g., `rwsr-xr-x`), or if it's represented in octal as `4xxx` (like `4755`), **DANGER! WE HAVE A POTENTIAL EXPLOITATION CANDIDATE.** * If a binary has the SUID bit set, any user who runs it will execute it with the privileges of the file's owner (which is usually `root`). This means we could potentially use it to escalate privileges permanently.
   * To find all binaries with SUID permissions on our system, we use the following command:
     `find / -type f -perm -4000 2>/dev/null`
