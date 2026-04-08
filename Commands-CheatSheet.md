@@ -131,6 +131,56 @@ Redirectors are simply a way to make a pointer point to another direction; they 
   * `2>&3`: Finally, we make pointer `2` point to pointer `3`, which holds the original path for successes.
   * *Result:* We have perfectly swapped the pointers without losing data. Pointer `1` now holds errors, and pointer `2` holds successes.
 
+## Text Processing and Manipulation (grep, awk, tr, tail, head...)
+
+To understand these commands, it is helpful to have a reference file. Let's assume we have a file containing a list of 10 devices with their corresponding IPs (`devices-ip.txt`):
+* `cat devices-ip.txt`
+
+```text
+device1 192.0.0.1
+device2 192.0.0.2
+device3 192.0.0.3
+device4 192.0.0.4
+device5 192.0.0.5
+device6 192.0.0.6
+device7 192.0.0.7
+device8 192.0.0.8
+device9 192.0.0.9
+device10 192.0.0.10
+```
+
+Suppose we now want to filter for device 3, and we don't care about the rest:
+* `cat devices-ip.txt | grep "device3"`
+* **Output:** `device3 192.0.0.3`
+
+*This way, using the `grep` command, we will display **all** lines that contain matches with the specified string.*
+
+Or, conversely, what if we want to show all devices **except** device 3:
+* `cat devices-ip.txt | grep -v "device3"`
+* **Output:**
+```text
+device1 192.0.0.1
+device2 192.0.0.2
+device4 192.0.0.4
+device5 192.0.0.5
+device6 192.0.0.6
+device7 192.0.0.7
+device8 192.0.0.8
+device9 192.0.0.9
+device10 192.0.0.10
+```
+
+If we want to avoid what is known as the **"useless use of cat" (UUOC)** (which we used above simply as an example to make the flow easier to understand), we can execute the command directly on the file from now on:
+* `grep "device3" devices-ip.txt`
+* **Output:** `device3 192.0.0.3`
+
+By default, `grep` is **case-sensitive**, meaning it differentiates between uppercase and lowercase letters. If we want to ignore this behavior, we can use the `-i` (ignore case) flag:
+* `grep -i "DEVICE3" devices-ip.txt`
+* **Output:** `device3 192.0.0.3`
+
+## Network Services & Protocols
+...
+
 ## Cron Jobs
 
 Cron jobs are simply automated tasks scheduled to run at a specific time, either repeatedly or just once.
